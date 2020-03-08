@@ -1,10 +1,11 @@
-.PHONY: dev pyspark pyspark-nb notebook lab streamlit info
+.PHONY: dev pyspark pyspark-nb notebook lab streamlit env
 
+DEV_ENV_FILE=dev-env.yaml
 
 CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
-PYTHON_VERSION=$$(sed -nE 's/[[:space:]]*- python=([[:digit:]]\.[[:digit:]])(\.[[:digit:]])*/\1/p' dev-env.yaml)
+PYTHON_VERSION=$$(sed -nE 's/[[:space:]]*- python=([[:digit:]]\.[[:digit:]])(\.[[:digit:]])*/\1/p' $(DEV_ENV_FILE))
 
-DEV_NAME:=$$(sed -nE 's/[[:space:]]*name:[[:space:]]*([_[:alnum:]]+)/\1/p' dev-env.yaml)
+DEV_NAME:=$$(sed -nE 's/[[:space:]]*name:[[:space:]]*([_[:alnum:]]+)/\1/p' $(DEV_ENV_FILE))
 DEV=$(CONDA_ACTIVATE) $(DEV_NAME) ;
 
 SPARK_ENV=\
@@ -15,7 +16,7 @@ export PYSPARK_DRIVER_PYTHON_OPTS='lab'
 
 dev:
 	@conda env remove --name $(DEV_NAME)
-	@conda env create -f dev-env.yaml
+	@conda env create -f $(DEV_ENV_FILE)
 
 pyspark:
 	@$(DEV) $(SPARK_ENV) ; pyspark
@@ -32,5 +33,5 @@ lab:
 streamlit:
 	@$(DEV) streamlit run streamlit/app.py
 
-info:
+env:
 	@$(DEV) conda list
