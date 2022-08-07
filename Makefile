@@ -1,6 +1,6 @@
-.PHONY: dev pyspark pyspark-nb notebook lab streamlit env
+.PHONY: cov docs docs-deploy env-dev env-info lab
 
-DEV_ENV_FILE=dev-env.yaml
+DEV_ENV_FILE=env-dev.yaml
 
 CONDA_ACTIVATE=source $$(conda info --base)/etc/profile.d/conda.sh ; conda activate ; conda activate
 PYTHON_VERSION=$$(sed -nE 's/[[:space:]]*- python=([[:digit:]]\.[[:digit:]])(\.[[:digit:]])*/\1/p' $(DEV_ENV_FILE))
@@ -8,30 +8,27 @@ PYTHON_VERSION=$$(sed -nE 's/[[:space:]]*- python=([[:digit:]]\.[[:digit:]])(\.[
 DEV_NAME:=$$(sed -nE 's/[[:space:]]*name:[[:space:]]*([_[:alnum:]]+)/\1/p' $(DEV_ENV_FILE))
 DEV=$(CONDA_ACTIVATE) $(DEV_NAME) ;
 
-SPARK_ENV=\
-export SPARK_HOME=$$(conda info --base)/envs/$(DEV_NAME)/lib/python$(PYTHON_VERSION)/site-packages/pyspark ; \
-export SPARK_LOCAL_IP=127.0.0.1 ; \
-export PYSPARK_DRIVER_PYTHON=jupyter ; \
-export PYSPARK_DRIVER_PYTHON_OPTS='lab'
+cov:
+	open -a "Google Chrome" htmlcov/index.html
 
-dev:
-	@conda env remove --name $(DEV_NAME)
-	@conda env create -f $(DEV_ENV_FILE)
+docs:
+	@$(DEV) mkdocs serve
 
-pyspark:
-	@$(DEV) $(SPARK_ENV) ; pyspark
+docs-deploy:
+	@$(DEV) mkdocs gh-deploy
 
-pyspark-nb:
-	@$(DEV) $(SPARK_ENV) ; export PYSPARK_DRIVER_PYTHON_OPTS='notebook' ; pyspark
+env-dev:
+	@mamba env remove --name $(DEV_NAME)
+	@mamba env create -f $(DEV_ENV_FILE)
 
-notebook:
-	@$(DEV) jupyter notebook
+env-info:
+	@$(DEV) conda list
 
 lab:
 	@$(DEV) jupyter lab
 
-streamlit:
-	@$(DEV) streamlit run streamlit/app.py
+test:
+	@$(DEV) echo "Not Implemented: add pytest command in Makefile"
 
-env:
-	@$(DEV) conda list
+types:
+	@$(DEV) echo "Not Implemented: add mypy command in Makefile"

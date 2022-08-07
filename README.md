@@ -1,71 +1,64 @@
 # Conda Environment Starter
 
-This repo is my current best practice for creating and managing `conda` development environments with a consistent and repeatable api controlled by `make`. The objective is to simply create a conda environment file to drive.
-
-## Prerequisite
-
-Before using this project you must have installed and configured `conda` on your local system.
-It is a best practice to install `miniconda` and use this pattern to manage project specific conda environments.
-You can find the latest [installers here](https://docs.conda.io/projects/conda/en/latest/user-guide/install/) or use a package manager like Homebrew if you are using MacOS.
-
-It is also recommended that you add the following to your `~/.condarc` to force conda-forge to be preferred over the default. It is also possible to add below section to the environment files as necessary.
-
-```yaml
-channels:
-  - conda-forge
-  - defaults
-```
+A simple starter for a `conda` development environment with a consistent and repeatable api to rebuild, test, and deploy with `make`. It provides a convenient way to have conda environment from within a folder reduce environment switching.
 
 ## Usage
 
-### Conda Environment
+### Environment file
 
-The ony requirement for usage is to update the 1.) `name` and 2.) the `python` version in `dev-env.yaml`. This starter pack also includes a basic stack frequently used in a data driven project:
+A simple conda environment is located at `env-dev.yaml`.
+Update the name of the environment to match your project at the top of the file.
 
-- numpy, pandas, pyspark, scikit-learn stack for analysis
-- jupyter and streamlit for exploration
-- the Altair/Vega-Lite ecosystem for visualizations
-- black, mypy, pylint, pytest for code quality
-
-**The `blas=*=mkl` entry optimizes this environment for intel based chipsets. Change this to `blas=*=openblas` for non-chip specific numerical computing libraries**
-
-Add or remove packages specific for your project as necessary.
-
-### Makefile commands
-
-The Makefile is used to (re)build the conda environment and activate said environment before running specific tasks.
-
-#### dev
-
-Either creates or updates the development environment. This rebuilds the entire environment when called so as to in order to create the optimal dependency tree each time a package is installed via the `dev-env.yaml` specification. If you change the name of the environment yaml file update the `DEV_ENV_FILE` variable in the Makefile appropriately.
-
-```bash
-make dev
+```yaml
+name: scistack-basic # Replace this name 
+dependencies:
+    ...
 ```
 
-#### Jupyter
+## Make Commands
 
-You can run `notebook` or `lab` with or without `pyspark`.
+If you add make command adding the `@$(DEV)` before the command statement will activate the environment before executing the the procedure.
 
-```bash
-make pyspark    # jupyter lab with pyspark
-make pyspark-nb # notebook with pyspark
-make notebook
-make lab
+| Comand        | Usage                                                       |
+| :------------ | :---------------------------------------------------------- |
+| `cov`         | Opens the coverage report from pytest-cov in Google Chrome  |
+| `docs`        | Runs an mkdocs development server                           |
+| `docs-deploy` | Deploys mkdocs to the repo's pages                          |
+| `env-dev`     | (Re)builds the conda environment in env-dev.yaml with mamba |
+| `env-info`    | List the contents of the conda environment                  |
+| `lab`         | Runs a vanilla JupyterLab server (VS Code is close)         |
+| `test`        | A place holder for pytest command                           |
+| `types`       | A place holder for mypy command                             |
+
+## Prerequisite Install Mambaforge
+
+Mambaforge is a conda distribution of python that pulls package
+
+### Apple Silicon
+
+Download Mambaforge Installer
+
+```zsh
+curl -L "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-arm64.sh" -o $HOME/Mambaforge-MacOSX-arm64.sh
 ```
 
-#### Streamlit
+Install in `$HOME`
 
-A streamlit app starter file is also included at `streamlit/app.py`.
-
-```bash
-make streamlit
+```zsh
+bash $HOME/Mambaforge-MacOSX-arm64.sh
 ```
 
-#### env
+### Apple Intel
 
-Prints the dependencies of the conda environment.
+Download Mambaforge Installer
 
-```base
-make env
+```zsh
+curl -L "https://github.com/conda-forge/miniforge/releases/latest/download/Mambaforge-MacOSX-x86_64.sh" -o $HOME/Mambaforge-MacOSX-arm64.sh
 ```
+
+Install in `$HOME`
+
+```zsh
+bash $HOME/Mambaforge-MacOSX-arm64.sh
+```
+
